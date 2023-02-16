@@ -3,7 +3,7 @@ import {
   MinLength,
   MaxLength,
   IsEmail,
-  IsOptional,
+  // IsOptional,
 } from 'class-validator';
 
 export class CreateAuthDto {
@@ -22,7 +22,7 @@ export class CreateAuthDto {
   @MinLength(6)
   @MaxLength(50)
   password: string;
-  @IsString()
-  @IsOptional()
-  photo?: string;
+  // @IsString()
+  // @IsOptional()
+  // photo?: string;
 }

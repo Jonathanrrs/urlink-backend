@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Profile } from '../../profiles/entities/profile.entity';
 
 @Entity() /* this is to create table on postgres */
 export class User {
@@ -11,10 +18,10 @@ export class User {
   @Column('text', { unique: true })
   email: string;
   /* remember - maybe this could be select false */
-  @Column('text')
+  @Column('text', { select: false })
   password: string;
-  @Column('text', {
-    nullable: true,
-  })
-  photo: string;
+  // @OneToOne(() => Profile, (profile) => profile.user)
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 }

@@ -62,4 +62,14 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     return token;
   }
+
+  async getAllUsers() {
+    const users = await this.userRepository.find({
+      select: { email: true, name: true },
+    });
+    return {
+      total: users.length,
+      users,
+    };
+  }
 }

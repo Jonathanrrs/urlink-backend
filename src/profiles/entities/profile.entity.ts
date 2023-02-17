@@ -22,7 +22,9 @@ export class Profile {
   })
   photo: string;
 
-  //   @OneToOne(() => User, (user) => user.profile, { eager: true })
+  @Column('text', { unique: true })
+  slug: string;
+
   @OneToOne(() => User)
   @JoinColumn()
   user: User;

@@ -20,7 +20,6 @@ export class User {
   /* remember - maybe this could be select false */
   @Column('text', { select: false })
   password: string;
-  // @OneToOne(() => Profile, (profile) => profile.user)
   @OneToOne(() => Profile)
   @JoinColumn()
   profile: Profile;

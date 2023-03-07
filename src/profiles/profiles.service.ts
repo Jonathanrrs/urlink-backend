@@ -9,7 +9,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { Profile } from './entities/profile.entity';
 import { User } from '../auth/entities/user.entity';
 import { UploadImage } from './helpers';
-import { ParseUUIDPipe } from '@nestjs/common';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfilesService {
@@ -30,6 +30,7 @@ export class ProfilesService {
         const resp = await image.upload(file);
         if (!resp)
           throw new BadRequestException('There was a problem with the file');
+        await image.deleteFromFileSystem(file);
         photo = resp.url;
       }
       const profile = this.profileRepository.create({
@@ -37,6 +38,7 @@ export class ProfilesService {
         user,
         photo: photo,
       });
+
       await this.profileRepository.save(profile);
       return { ...createProfileDto, user, photo: photo };
     } catch (error) {
@@ -78,14 +80,16 @@ export class ProfilesService {
         user: true,
       },
     });
-    if (!found) throw new NotFoundException(`The profile does not exists`);
+    if (!found) throw new NotFoundException(`The profile does not exist`);
     return found;
   }
+
   async getAllProfiles() {
     const profiles = this.profileRepository.find({
       select: {
         slug: true,
         photo: true,
+        description: true,
         user: {
           name: true,
           lastName: true,
@@ -97,5 +101,35 @@ export class ProfilesService {
     });
 
     return profiles;
+  }
+
+  async update(
+    user: User,
+    updateProfileDto: UpdateProfileDto,
+    file: Express.Multer.File,
+  ) {
+    const foundUser = await this.getProfileWithToken(user);
+
+    if (foundUser) {
+      if (file) {
+        let photo = null;
+        const splitPhoto = foundUser.photo.split('/');
+        const getIdPhoto = splitPhoto[splitPhoto.length - 1].split('.')[0];
+        const image = new UploadImage();
+        const resp = await image.upload(file);
+        if (!resp)
+          throw new BadRequestException('There was a problem with the file');
+        await image.deleteFromCloudinary(getIdPhoto);
+        await image.deleteFromFileSystem(file);
+        photo = resp.url;
+        console.log(photo, 'new photo');
+
+        updateProfileDto = { ...updateProfileDto, photo };
+      }
+      /* actualizar img */
+      const updated = { ...foundUser, ...updateProfileDto };
+      const profileUpdated = this.profileRepository.save(updated);
+      return profileUpdated;
+    }
   }
 }

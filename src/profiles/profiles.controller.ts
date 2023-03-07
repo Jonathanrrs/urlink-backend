@@ -1,4 +1,11 @@
-import { Controller, Post, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+} from '@nestjs/common';
 import { Body, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { ProfilesService } from './profiles.service';
@@ -8,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
 import { fileNamer } from './helpers/fileNamer.helper';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -51,5 +59,25 @@ export class ProfilesController {
   @Get('allProfiles')
   getAllProfiles() {
     return this.profilesService.getAllProfiles();
+  }
+
+  @Patch('/update')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: fileFilter,
+      preservePath: true,
+      storage: diskStorage({
+        destination: './static/profiles',
+        filename: fileNamer,
+      }),
+    }),
+  )
+  @Auth()
+  update(
+    @GetUser() user: User,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.profilesService.update(user, updateProfileDto, file);
   }
 }

@@ -18,6 +18,8 @@ export class UploadImage {
       const upload = await cloudinary.uploader.upload(file.path, options);
       return upload;
     } catch (error) {
+      console.log(error);
+
       throw new Error('There a error');
     }
   }
@@ -27,6 +29,22 @@ export class UploadImage {
       await unlinkSync(file.path);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async deleteFromCloudinary(id: string) {
+    cloudinary.config({
+      secure: true,
+      api_key: process.env.CLOUDINARY_KEY,
+      cloud_name: process.env.CLOUDINARY_NAME,
+      api_secret: process.env.CLOUDINARY_SECRET,
+    });
+    try {
+      await cloudinary.uploader.destroy(id);
+    } catch (error) {
+      console.log(error);
+
+      throw new Error('There a error');
     }
   }
 }

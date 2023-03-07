@@ -72,4 +72,17 @@ export class AuthService {
       users,
     };
   }
+
+  async verifyToken(headers: Headers) {
+    const headerAuth: string = headers['authorization'];
+    const token = headerAuth.split(' ')[1];
+    try {
+      await this.jwtService.verifyAsync(token);
+      return {
+        msg: 'Token valid',
+      };
+    } catch (error) {
+      throw new BadRequestException('Token invalid');
+    }
+  }
 }

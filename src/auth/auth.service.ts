@@ -85,4 +85,14 @@ export class AuthService {
       throw new BadRequestException('Token invalid');
     }
   }
+
+  async aboutUser(user: User, headers: Headers) {
+    const headerAuth: string = headers['authorization'];
+    const token = headerAuth.split(' ')[1];
+    try {
+      return { ...user, token };
+    } catch (error) {
+      throw new BadRequestException('Token invalid');
+    }
+  }
 }

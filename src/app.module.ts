@@ -16,6 +16,7 @@ import { ProfilesModule } from './profiles/profiles.module';
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
+      port: +process.env.DB_PORT,
       autoLoadEntities: true,
       /* este no es para prod usualmente */
       synchronize: true,

@@ -113,13 +113,15 @@ export class ProfilesService {
     if (foundUser) {
       if (file) {
         let photo = null;
-        const splitPhoto = foundUser.photo.split('/');
-        const getIdPhoto = splitPhoto[splitPhoto.length - 1].split('.')[0];
         const image = new UploadImage();
+        if (foundUser.photo) {
+          const splitPhoto = foundUser.photo.split('/');
+          const getIdPhoto = splitPhoto[splitPhoto.length - 1].split('.')[0];
+          await image.deleteFromCloudinary(getIdPhoto);
+        }
         const resp = await image.upload(file);
         if (!resp)
           throw new BadRequestException('There was a problem with the file');
-        await image.deleteFromCloudinary(getIdPhoto);
         await image.deleteFromFileSystem(file);
         photo = resp.url;
         console.log(photo, 'new photo');
